@@ -1,0 +1,203 @@
+<!doctype html >
+<html> 
+<head>
+<style>
+#databox{
+position:absolute;
+left: 400px;
+top: 200px;
+}
+p{
+color: white;
+}
+body{
+background-color: black;
+}
+#y-axis {  
+  position:absolute;
+  z-index: 1;  
+  left:100px; 
+  width:4px;  
+  height:100%;
+  background:white; 
+}
+#x-axis {  
+  position:absolute;
+  z-index: 1;   
+  bottom:100px;  
+  width: 100%;  
+  height:4px;
+  background:white; 
+}
+#left {
+padding: 25px 60px;
+left: -60px;
+position: absolute;
+background-color: white;
+}
+#right {
+padding: 60px 25px;
+bottom:-60px;
+left:100px;
+position: absolute;
+background-color: red;
+}
+</style>
+<script src="leap-0.6.1.js"></script>
+<script src="leap-plugins-0.1.6.js"></script>
+<script src="Audiolet.js"></script>
+
+<script>
+var freq2;
+var freq1 = 0;
+var gain2;
+var gain1;
+var musicOn = 0;
+window.audiolet = new Audiolet();
+function modExample() { 
+    if (freq2 != freq1 ) {
+         window.sine = new Sine(window.audiolet, parseInt(freq1));
+         window.gain = new Gain(window.audiolet);
+         window.reverb = new Reverb(window.audiolet);
+         window.delay = new Delay(window.audiolet);
+         window.sine.connect(window.gain);
+         window.gain.connect(window.reverb);
+         window.delay.connect(window.reverb)
+         window.reverb.connect(window.audiolet.output);
+         freq2 = freq1;	//SAVES MEMORY!!!
+    }; 
+
+};
+function modExample2() { 
+    if (freq2 != freq1 ) {
+         window.sine.frequency.value = freq1;
+         freq2 = freq1;	//SAVES MEMORY!!!
+    }; 
+    if (gain2 != gain1) {
+    	  window.gain.gain.value = gain1;
+        gain2 = gain1;	//SAVES MEMORY!!!
+    }
+
+};
+function stopExample() {              
+        window.reverb.disconnect(window.audiolet.output);
+        
+};
+function startExample() {
+	      		if (musicOn == 1) {
+		      		musicOn = 0 ;
+		      		stopExample();       				   				 
+      		 	}		
+      			else if (musicOn == 0) {
+      			    musicOn = 1 ;
+       			 	 modExample(); 
+      		 	};
+}
+
+
+
+//*********************************Funcion de Transformacion*********************************************
+
+
+function setTransform (handtype, position, rotation, direction, velocity) {   
+	 var k = 8;
+	 
+	 if (handtype == "right") {
+	    if (position[0] > 70) {
+	       document.getElementById(handtype).style.left = 
+          (position[0]-70)*k + 100 +'px';	
+          freq1 = -(position[0]-70)*k;
+          //freq1 = (position[0]-90)*k;
+          //document.getElementById('data').innerHTML = 'Frecuencia:'+parseInt(freq1)+'<br/>';
+          //document.getElementById('data').innerHTML = 'velocity:'+parseInt(velocity);
+          	if (musicOn==1) {
+          		modExample2();
+          		document.getElementById('data').innerHTML = 'Frecuencia:'+window.sine.frequency.value+'<br/> Ganancia:'+
+          		window.gain.gain.value;          	
+         	};
+	    }
+	    else {
+	    	document.getElementById(handtype).style.left = 100+'px'; 
+	    	//si la posición de la mano es menor a cero deja el cuadro en su posición inicial
+	    };
+	     
+	 }    
+	 else if (handtype == "left") {
+	 		if (position[1] > 130 && position[1] < 500) {
+	 			document.getElementById(handtype).style.bottom  = 
+            (position[1]) +'px';
+			if (direction[1] > 0.01) {
+				//gain1 = (parseInt(direction[1]*10)) / 10;
+				gain1 = direction[1];
+			}
+			else {
+				gain1 = 0;
+			};         	
+         if (musicOn==1) {
+          		modExample2();          	
+         	};   
+	 		}
+	 		else {
+	 		//document.getElementById(handtype).style.bottom = 130+'px'; 
+	    	//si la posición de la mano es menor a cero deja el cuadro en su posición inicial
+	 		}
+	         
+	 };
+	// document.getElementById(handtype).innerHTML = position +'<br/>'+ document.getElementById(handtype).style.left +'<br/>'+
+    //document.getElementById(handtype).style.bottom+'<br/>'+gain1 ;
+//		***muestra variables en las cajas feas***     
+//    parseInt(document.getElementById(handtype).style.left);
+    };
+
+//******************************LEAP LOOP*********************************************
+
+
+var options = { enableGestures: true }; //activa la detección de gestos
+
+Leap.loop(options,function(frame) {
+   for(var i = 0, len = frame.hands.length; i < len; i++)
+      {
+      var hand = frame.hands[i];
+      var hand_position = hand.palmPosition;
+      hand_velocity = hand.palmVelocity;
+      var hand_direction = hand.direction;
+      var hand_type = hand.type;
+      var hand_roll = hand.roll();
+      
+      if ("right" == hand_type){
+      //si es derecha...  
+      setTransform(hand_type, hand_position, hand_roll, hand_direction, hand_velocity); 
+      }      
+      else if ("left" == hand_type){
+      //si es izquierda...
+      setTransform(hand_type, hand_position, hand_roll, hand_direction, hand_velocity);
+      };
+   };
+
+
+
+}).use('screenPosition', {scale: 0.25});;
+
+</script>
+
+</head>
+
+<body>
+<input type=button onClick="parent.location='ejemplo1.html'" value='Ejemplo 1'>
+<input type=button onClick="parent.location='ejemplo2.html'" value='Ejemplo 2'>
+<input type=button onClick="parent.location='ejemplo3.html'" value='Ejemplo 3'>
+<input type=button onClick="parent.location='ejemplo4.html'" value='Ejemplo 4'>
+<div id="y-axis">
+<div id="left" ></div>
+</div>
+
+<div id="x-axis">
+<div id="right"></div>
+</div>
+<div id="databox">
+<button type="button" onclick="startExample()">&#9654; Play</button>
+<p id="data">The Data Box 8)</p>
+</div>
+</body>
+
+</html>

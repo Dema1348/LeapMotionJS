@@ -1,0 +1,85 @@
+<!doctype html >
+<html> 
+<head>
+<style>
+body{
+background-color: black;
+}
+#axis {  
+  position:fixed;
+  z-index: 100;   
+  left:50%;  
+  width:4px;  
+  height:100%;
+  background:white; 
+}
+#left {
+padding: 50px;
+width: 200 px;
+height: 200 px;
+left: 100 px;
+top: 100 px;
+position: absolute;
+background-color: white;
+}
+#indice {
+position:absolute;
+width: 100 px;
+height: 100 px;
+background-color: red;
+}
+</style>
+<script src="leap-0.6.1.js"></script>
+<script src="leap-plugins-0.1.6.js"></script>
+<script src="Audiolet.js"></script>
+<script>
+function setTransform (handtype, position) {
+	document.getElementById('left').innerHTML = "Mano:"+handtype+"<br/>Posicion:"+position;
+	document.getElementById('left').style.left = position[0]+'px';
+	document.getElementById('left').style.bottom = position[1]+'px';
+    };
+function fingersTransform(mano,index,position,finger){
+	
+	if (finger == 1)
+	{
+	document.getElementById('indice').innerHTML = "indice" ;
+	document.getElementById('indice').style.left = position[0]+'px';
+	document.getElementById('indice').style.bottom = position[1]+'px';
+	};
+	};
+
+
+Leap.loop(function(frame) {
+   for(var i = 0, len = frame.hands.length; i < len; i++)
+      {
+      var hand = frame.hands[i];
+      var hand_position = hand.palmPosition;
+      var hand_velocity = hand.palmVelocity;
+      var hand_direction = hand.direction;
+      var hand_type = hand.type;
+      var hand_roll = hand.roll();	  
+	  setTransform(hand_type, hand_position);
+	  
+		 for (var j = 0, len2 = hand.fingers.length; j < len2; j++) 
+   		{
+      		finger = hand.fingers[j];     	
+		
+			console.log("Dedos totales"+finger.length);
+		
+			fingersTransform(hand_type,j,finger.dipPosition,finger.type);
+      	};
+	  
+      };
+   }).use('screenPosition', {scale: 0.25});
+
+</script>
+
+</head>
+
+<body>
+<div id="axis">
+<div id="left" >asdasdasdasd</div>
+<div id="indice" >asdasdasdasd</div>
+</div>
+</body>
+</html>

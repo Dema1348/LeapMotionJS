@@ -1,0 +1,99 @@
+<!doctype html >
+<html> 
+<head>
+<style>
+body{
+background-color: black;
+}
+#axis {  
+  position:fixed;
+  z-index: 100;   
+  left:50%;  
+  width:4px;  
+  height:100%;
+  background:black; 
+}
+#left {
+padding: 50px;
+width: 200 px;
+height: 200 px;
+left: 100 px;
+top: 100 px;
+position: absolute;
+background-color: white;
+}
+#right {
+padding: 50px;
+width: 200 px;
+height: 200 px;
+left: 100 px;
+top: 100 px;
+position: absolute;
+background-color: red;
+}
+</style>
+<script src="leap-0.6.1.js"></script>
+<script src="leap-plugins-0.1.6.js"></script>
+<script src="Audiolet.js"></script>
+<script>
+function setTransform (handtype, position, rotation, direction) {
+    var ktur = direction[1]*10;    
+    var k = 3.9;
+    var kd = direction[1]*10;
+    if (ktur > 1) {
+    	var turbo = kd;
+    }
+    else {
+    	var turbo = 1;
+    }
+    document.getElementById(handtype).style.left = 
+    (position[0])* k * turbo +'px';
+    document.getElementById(handtype).style.bottom  = 
+    (position[1])*2.5 +'px';
+    document.getElementById(handtype).style.transform = 'rotate(' + -rotation + 'rad)';	
+    document.getElementById(handtype).style.webkitTransform = 
+    document.getElementById(handtype).style.MozTransform = 
+    document.getElementById(handtype).style.msTransform =
+    document.getElementById(handtype).style.Transform = 
+    document.getElementById(handtype).style.transform;
+    document.getElementById(handtype).innerHTML = parseInt(turbo); 
+//    parseInt(document.getElementById(handtype).style.left);
+    };
+
+
+Leap.loop(function(frame) {
+   for(var i = 0, len = frame.hands.length; i < len; i++)
+      {
+      var hand = frame.hands[i];
+      var hand_position = hand.palmPosition;
+      var hand_velocity = hand.palmVelocity;
+      var hand_direction = hand.direction;
+      var hand_type = hand.type;
+      var hand_roll = hand.roll();
+      if ("right" == hand_type){  
+      setTransform(hand_type, hand_position, hand_roll, hand_direction);
+      }      
+      else if ("left" == hand_type){
+      setTransform(hand_type, hand_position, hand_roll, hand_direction);
+      };
+   };
+}).use('screenPosition', {scale: 0.25});;
+
+</script>
+
+</head>
+
+<body>
+<input type=button onClick="parent.location='ejemplo1.html'" value='Ejemplo 1'>
+<input type=button onClick="parent.location='ejemplo2.html'" value='Ejemplo 2'>
+<input type=button onClick="parent.location='ejemplo3.html'" value='Ejemplo 3'>
+<input type=button onClick="parent.location='ejemplo4.html'" value='Ejemplo 4'>
+
+<div id="axis">
+<div id="left" ></div>
+<div id="right"></div>
+</div>
+
+</body>
+
+</html>

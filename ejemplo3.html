@@ -1,0 +1,207 @@
+<!doctype html >
+<html>
+<head>
+<style>
+#databox{
+position:absolute;
+right: 70px;
+top: 50px;
+height: 100px;
+width: 250px;
+background-color:white;
+}
+body{
+background-color: black;
+color: white; 
+}
+p {
+text-align: center;
+}
+#axis {  
+  position:fixed;
+  z-index: 100;   
+  left:50%;  
+  width:4px;  
+  height:100%;
+  background:black; 
+}
+#left {
+position:absolute;
+left: 100px;
+bottom: 200px;
+color: white;
+}
+#right {
+position:absolute;
+left: 100px;
+bottom: 200px;
+color: white;
+}
+</style>
+<script src="leap-0.6.1.js"></script>
+<script src="leap-plugins-0.1.6.js"></script>
+<script src="Audiolet.js"></script>
+</head>
+
+<body>
+<input type=button onClick="parent.location='ejemplo1.html'" value='Ejemplo 1'>
+<input type=button onClick="parent.location='ejemplo2.html'" value='Ejemplo 2'>
+<input type=button onClick="parent.location='ejemplo3.html'" value='Ejemplo 3'>
+<input type=button onClick="parent.location='ejemplo4.html'" value='Ejemplo 4'>
+<script>
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+};
+function handTransform (handtype, position, rotation, direction) {
+    if (handtype == "left") {
+    	document.getElementById('left').style.left = (position[0]-50)+"px";
+		document.getElementById('left').style.bottom = (position[1])+"px";
+		var str = 'x:'+position[0]+'<br/>y:'+position[1]+'<br/>z:'+position[2];
+		document.getElementById('datal').innerHTML = str;
+		document.getElementById('datal2').innerHTML = handtype;
+		var img = document.getElementById('cruzl');
+		img.style.transform = 'rotate(' + -rotation + 'rad)';	
+      img.style.webkitTransform = img.style.MozTransform = img.style.msTransform =
+      img.style.Transform = img.style.transform;
+      if (position[2] < -49) {
+      	document.getElementById('left').style.color = getRandomColor();
+      
+      }
+      else {
+      	document.getElementById('left').style.color = "white";
+      };
+		}
+    else if (handtype == "right") {
+    	document.getElementById('right').style.left = (position[0]-50)+"px";
+		document.getElementById('right').style.bottom = (position[1])+"px";
+		var str = 'x:'+position[0]+'<br/>y:'+position[1]+'<br/>z:'+position[2];
+		document.getElementById('datar').innerHTML = str;
+		document.getElementById('datar2').innerHTML = handtype;
+		var img = document.getElementById('cruzr');
+		img.style.transform = 'rotate(' + -rotation + 'rad)';	
+      img.style.webkitTransform = img.style.MozTransform = img.style.msTransform =
+      img.style.Transform = img.style.transform;
+      if (position[2] < -49) {
+      	document.getElementById('right').style.color = getRandomColor();
+      
+      }
+      else {
+      	document.getElementById('right').style.color = "white";
+      };
+};};
+function fingersTransform (handtype,num,position,finger) {
+    //console.log(position+getFingerName(finger)+num);
+    if (handtype == "left") {
+    var obj = "dedo"+handtype+finger;
+    var txt = "pdedo"+handtype+finger; 
+    document.getElementById(obj).style.left = position[0]*2.2+"px";
+    document.getElementById(obj).style.bottom = position[1]*2.2+"px";
+    document.getElementById(obj).style.position = "absolute";
+    document.getElementById(txt).innerHTML = getFingerName(finger);
+    if (position[2] < -90) {
+      	document.body.style.color = getRandomColor();
+      
+      }
+      else {
+      	document.body.style.color = "white";
+      };
+      }
+    else if (handtype == "right") {
+    var obj = "dedo"+handtype+finger;
+    var txt = "pdedo"+handtype+finger; 
+    document.getElementById(obj).style.left = position[0]*2.2+"px";
+    document.getElementById(obj).style.bottom = position[1]*2.2+"px";
+    document.getElementById(obj).style.position = "absolute";
+    document.getElementById(txt).innerHTML = getFingerName(finger);
+    if (position[2] < -90) {
+      	document.body.style.color = getRandomColor();
+      
+      }
+      else {
+      	document.body.style.color = "white";
+      };
+    
+    		}
+    };
+function getFingerName(fingerType) {
+      switch(fingerType) {
+        case 0:
+          return 'Pulgar';
+        break;
+    
+        case 1:
+          return 'Indice';
+        break;
+    
+        case 2:
+          return 'Medio';
+        break;
+    
+        case 3:
+          return 'Anillo';
+        break;
+    
+        case 4:
+          return 'Menique';
+        break;
+      }
+    };
+
+
+Leap.loop(function(frame) {
+   for(var i = 0, len = frame.hands.length; i < len; i++)
+      {
+      var hand = frame.hands[i];
+      var hand_position = hand.palmPosition;
+      var hand_velocity = hand.palmVelocity;
+      var hand_direction = hand.direction;
+      var hand_type = hand.type;
+      var hand_roll = hand.roll(); 
+      handTransform(hand_type, hand_position, hand_roll, hand_direction);
+      
+      for (var j = 0, len2 = hand.fingers.length; j < len2; j++) 
+   		{
+      		finger = hand.fingers[j];
+      		fingersTransform(hand_type,j,finger.dipPosition,finger.type);
+      	};
+      };
+
+}).use('screenPosition', {scale: 0.25});;
+</script>
+<div id="axis">
+
+<div id="left">
+<p id="datal"></p>
+<img src="cruz.png" alt="cruz" id="cruzl" height="50" width="50">
+<p id="datal2"></p>
+</div>
+
+<div id="fingers">
+<div id="dedoleft0"><p id="pdedoleft0"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoleft1"><p id="pdedoleft1"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoleft2"><p id="pdedoleft2"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoleft3"><p id="pdedoleft3"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoleft4"><p id="pdedoleft4"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoright0"><p id="pdedoright0"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoright1"><p id="pdedoright1"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoright2"><p id="pdedoright2"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoright3"><p id="pdedoright3"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+<div id="dedoright4"><p id="pdedoright4"></p><img src="dot.png" alt="dot"  class="dedos" height="25" width="25"></div>
+</div>
+
+<div id="right">
+<p id="datar"></p>
+<p><img src="cruz.png" alt="cruz" id="cruzr" height="50" width="50"></p>
+<p id="datar2"></p>
+</div>
+
+</div>
+
+</body>
+
+</html>
